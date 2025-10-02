@@ -22,6 +22,9 @@ scos_os:= "rhcos"
 fcos_label:= "fedora-coreos"
 scos_label:= "centos-stream-coreos"
 
+afterburn_commit:= `git ls-remote https://github.com/qinqon/afterburn.git refs/heads/kubevirt-support-cloud-init-network-data | cut -f1`
+ignition_commit:= `git ls-remote https://github.com/qinqon/ignition.git refs/heads/kubevirt-nocloud | cut -f1`
+
 toolbox := if os == "scos" { scos_toolbox_img } else { fcos_toolbox_img }
 base := if os == "scos" { scos_base_img } else { fcos_base_img }
 image := if os == "scos" { scos_img } else { fcos_img }
@@ -31,8 +34,7 @@ label := if os == "scos" { scos_label } else { fcos_label }
 archive := os + ".ociarchive"
 
 build:
-    cp Containerfile afterburn
-    sudo podman build --authfile {{auth_file}} --network=host --build-arg TOOLBOX={{toolbox}} --build-arg BASE={{base}} --build-arg LABEL={{label}} -t {{image}} afterburn
+    sudo podman build --authfile {{auth_file}} --network=host --build-arg TOOLBOX={{toolbox}} --build-arg BASE={{base}} --build-arg LABEL={{label}} --build-arg AFTERBURN_COMMIT={{afterburn_commit}} -t {{image}} .
 
 oci-archive:
     sudo skopeo copy containers-storage:{{image}} oci-archive:{{archive}}

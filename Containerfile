@@ -3,12 +3,15 @@ ARG LABEL
 ARG TOOLBOX
 FROM $TOOLBOX as build
 
-RUN dnf install -y rust cargo openssl-devel make
+ARG AFTERBURN_COMMIT
 
-COPY . /afterburn/
+RUN dnf install -y openssl-devel make git gcc rust cargo
 
-# Use a cache mount for the cargo registry
-RUN  make -C afterburn
+RUN git clone https://github.com/qinqon/afterburn.git /afterburn && \
+    cd /afterburn && \
+    git checkout ${AFTERBURN_COMMIT}
+
+RUN  make -C /afterburn
 
 FROM $BASE
 
