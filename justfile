@@ -34,9 +34,6 @@ build:
     cp Containerfile afterburn
     sudo podman build --authfile {{auth_file}} --network=host --build-arg TOOLBOX={{toolbox}} --build-arg BASE={{base}} --build-arg LABEL={{label}} -t {{image}} afterburn
 
-inspect:
-    sudo podman build --authfile {{auth_file}} --network=host --build-arg TOOLBOX={{toolbox}} --build-arg BASE={{base}} --build-arg LABEL={{label}} -t {{image}} -f Containerfile.inspect
-
 oci-archive:
     sudo skopeo copy containers-storage:{{image}} oci-archive:{{archive}}
 
