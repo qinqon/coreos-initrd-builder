@@ -33,8 +33,10 @@ os_name := if os == "scos" { scos_os } else { fcos_os }
 label := if os == "scos" { scos_label } else { fcos_label }
 archive := os + ".ociarchive"
 
+all: build oci-archive osbuild-kubevirt push-kubevirt
+
 build:
-    sudo podman build --authfile {{auth_file}} --network=host --build-arg TOOLBOX={{toolbox}} --build-arg BASE={{base}} --build-arg LABEL={{label}} --build-arg AFTERBURN_COMMIT={{afterburn_commit}} -t {{image}} .
+    sudo podman build --authfile {{auth_file}} --network=host --build-arg TOOLBOX={{toolbox}} --build-arg BASE={{base}} --build-arg LABEL={{label}} --build-arg AFTERBURN_COMMIT={{afterburn_commit}} --build-arg IGNITION_COMMIT={{ignition_commit}} -t {{image}} .
 
 oci-archive:
     sudo skopeo copy containers-storage:{{image}} oci-archive:{{archive}}

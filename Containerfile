@@ -1,7 +1,7 @@
 ARG BASE
 ARG LABEL
 ARG TOOLBOX
-FROM $TOOLBOX as build
+FROM $TOOLBOX as afterburn-build
 
 ARG AFTERBURN_COMMIT
 
@@ -13,10 +13,25 @@ RUN git clone https://github.com/qinqon/afterburn.git /afterburn && \
 
 RUN  make -C /afterburn
 
+FROM $TOOLBOX as ignition-build
+
+ARG IGNITION_COMMIT
+
+RUN dnf install -y make git golang libblkid-devel
+
+RUN git clone https://github.com/qinqon/ignition.git /ignition && \
+    cd /ignition && \
+    git checkout ${IGNITION_COMMIT}
+
+RUN  make -C /ignition
+
 FROM $BASE
 
-COPY --from=build /afterburn/target/release/afterburn /usr/bin/afterburn
-COPY --from=build /afterburn/dracut/30afterburn/* /usr/lib/dracut/modules.d/30afterburn
+COPY --from=afterburn-build /afterburn/target/release/afterburn /usr/bin/afterburn
+COPY --from=afterburn-build /afterburn/dracut/30afterburn/* /usr/lib/dracut/modules.d/30afterburn
+
+COPY --from=ignition-build /ignition/bin/amd64/ignition /usr/bin/ignition
+COPY --from=ignition-build /ignition/bin/amd64/ignition /usr/lib/dracut/modules.d/30ignition/ignition
 
 RUN set -xeuo pipefail && \
     KERNEL_VERSION="$(basename $(ls -d /lib/modules/*))" && \
