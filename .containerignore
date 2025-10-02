@@ -1,0 +1,20 @@
+# OCI archive artifacts
+cache
+*.ociarchive
+
+# Build artifacts
+afterburn
+
+# Git
+.git
+.gitignore
+
+# Editor and IDE
+*.swp
+*.swo
+*~
+.vscode
+.idea
+
+# Just build files
+justfile
